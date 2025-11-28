@@ -1,25 +1,21 @@
-# Build stage
-FROM golang:1.21-bullseye AS builder
+FROM golang:1.25-alpine
+
+# Install needed tools
+RUN apk add --no-cache git bash
+
+# Add go/bin to PATH
+ENV PATH="/go/bin:${PATH}"
+
+# Install Air (hot reload)
+RUN go install github.com/air-verse/air@latest
 
 WORKDIR /app
 
-# Set GOPROXY để tránh mạng bị chặn
-ENV GOPROXY=https://proxy.golang.org,direct
-
-# Copy go.mod và go.sum
-COPY go.mod go.sum ./
-
-# Copy toàn bộ source
+# Copy entire project
 COPY . .
 
-# Build binary
-RUN go build -o main .
-
-# Run stage
-FROM debian:bullseye-slim
-
-WORKDIR /app
-COPY --from=builder /app/main .
-
+# Expose backend port
 EXPOSE 8080
-CMD ["./main"]
+
+# Run Air
+CMD ["air", "-c", ".air.toml"]

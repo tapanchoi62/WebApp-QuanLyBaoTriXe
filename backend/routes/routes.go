@@ -8,8 +8,8 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 	api := r.Group("/api")
-	r.POST("/login", controllers.Login)
-
+	r.POST("/api/login", controllers.Login)
+	r.POST("/api/register", controllers.RegisterUser)
 	api.Use(middleware.AuthRequired())
 	{
 		api.GET("/vehicles", controllers.GetVehicles)

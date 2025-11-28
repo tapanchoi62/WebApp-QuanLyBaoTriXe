@@ -1,0 +1,12 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o main ."
+bin = "main"
+include_ext = ["go","tpl","tmpl","html"]
+exclude_dir = ["tmp","vendor"]
+delay = 1000
+
+[watch]
+use_polling = true   # Windows/Mac Docker Desktop dùng polling để detect file change

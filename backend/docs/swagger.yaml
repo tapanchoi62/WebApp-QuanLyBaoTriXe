@@ -1,0 +1,167 @@
+basePath: /
+definitions:
+  models.Vehicle:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      model:
+        type: string
+      note:
+        type: string
+      plate_number:
+        type: string
+      year:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for fleet management
+  title: Fleet Management API
+  version: "1.0"
+paths:
+  /api/vehicles:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all vehicles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all vehicles
+      tags:
+      - Vehicles
+    post:
+      consumes:
+      - application/json
+      description: Create vehicle by JSON body
+      parameters:
+      - description: Vehicle info
+        in: body
+        name: vehicle
+        required: true
+        schema:
+          $ref: '#/definitions/models.Vehicle'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new vehicle
+      tags:
+      - Vehicles
+  /api/vehicles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete vehicle by ID
+      parameters:
+      - description: Vehicle ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a vehicle
+      tags:
+      - Vehicles
+    get:
+      consumes:
+      - application/json
+      description: Get a vehicle by its ID
+      parameters:
+      - description: Vehicle ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Vehicle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get vehicle by ID
+      tags:
+      - Vehicles
+    put:
+      consumes:
+      - application/json
+      description: Update vehicle by ID
+      parameters:
+      - description: Vehicle ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Vehicle info
+        in: body
+        name: vehicle
+        required: true
+        schema:
+          $ref: '#/definitions/models.Vehicle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Vehicle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a vehicle
+      tags:
+      - Vehicles
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
