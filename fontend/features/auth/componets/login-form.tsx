@@ -39,8 +39,13 @@ export default function LoginForm({
       
       router.push("/dashboard");
       alert("Login thành công!");
-    } catch (err: any) {
-      setErrorMsg(err.response?.data?.error || "Login thất bại");
+    } catch (err) {
+      if (typeof err === "object" && err !== null && "response" in err) {
+        const errorObj = err as { response?: { data?: { error?: string } } };
+        setErrorMsg(errorObj.response?.data?.error || "Login thất bại");
+      } else {
+        setErrorMsg("Login thất bại");
+      }
     }
   };
 
