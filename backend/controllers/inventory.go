@@ -14,6 +14,7 @@ import (
 // @Tags Inventory
 // @Produce json
 // @Success 200 {array} models.Inventory
+// @Security BearerAuth
 // @Router /inventory [get]
 func GetInventories(c *gin.Context) {
 	var inventories []models.Inventory
@@ -27,6 +28,7 @@ func GetInventories(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Inventory ID"
 // @Success 200 {object} models.Inventory
+// @Security BearerAuth
 // @Router /inventory/{id} [get]
 func GetInventory(c *gin.Context) {
 	id := c.Param("id")
@@ -46,6 +48,7 @@ func GetInventory(c *gin.Context) {
 // @Produce json
 // @Param request body models.Inventory true "Inventory body"
 // @Success 201 {object} models.Inventory
+// @Security BearerAuth
 // @Router /inventory [post]
 func CreateInventory(c *gin.Context) {
 	var input models.Inventory
@@ -76,6 +79,7 @@ func CreateInventory(c *gin.Context) {
 // @Param id path int true "Inventory ID"
 // @Param request body models.Inventory true "Inventory body"
 // @Success 200 {object} models.Inventory
+// @Security BearerAuth
 // @Router /inventory/{id} [put]
 func UpdateInventory(c *gin.Context) {
 	id := c.Param("id")
@@ -101,6 +105,7 @@ func UpdateInventory(c *gin.Context) {
 // @Tags Inventory
 // @Param id path int true "Inventory ID"
 // @Success 200 {object} map[string]string
+// @Security BearerAuth
 // @Router /inventory/{id} [delete]
 func DeleteInventory(c *gin.Context) {
 	id := c.Param("id")

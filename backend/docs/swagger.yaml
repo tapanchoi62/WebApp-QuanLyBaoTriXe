@@ -103,7 +103,7 @@ info:
   title: Fleet Management API
   version: "1.0"
 paths:
-  /api/Item:
+  /api/item:
     get:
       consumes:
       - application/json
@@ -147,7 +147,7 @@ paths:
       summary: Create a new Item
       tags:
       - Item
-  /api/Item/{id}:
+  /api/item/{id}:
     delete:
       consumes:
       - application/json

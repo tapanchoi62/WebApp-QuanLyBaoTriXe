@@ -16,7 +16,7 @@ import (
 // @Produce json
 // @Success 200 {array} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/Item [get]
+// @Router /api/item [get]
 func GetItems(c *gin.Context) {
 	var Item []models.Item
 	config.DB.Find(&Item)
@@ -33,7 +33,7 @@ func GetItems(c *gin.Context) {
 // @Success 200 {object} models.Item
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/Item/{id} [get]
+// @Router /api/item/{id} [get]
 func GetItem(c *gin.Context) {
 	id := c.Param("id")
 	var Item models.Item
@@ -53,7 +53,7 @@ func GetItem(c *gin.Context) {
 // @Param Item body models.Item true "Item info"
 // @Success 201 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/Item [post]
+// @Router /api/item [post]
 func CreateItem(c *gin.Context) {
 	var input models.Item
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -75,7 +75,7 @@ func CreateItem(c *gin.Context) {
 // @Success 200 {object} models.Item
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/Item/{id} [put]
+// @Router /api/item/{id} [put]
 func UpdateItem(c *gin.Context) {
 	id := c.Param("id")
 	var item models.Item
@@ -105,7 +105,7 @@ func UpdateItem(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/Item/{id} [delete]
+// @Router /api/item/{id} [delete]
 func DeleteItem(c *gin.Context) {
 	id := c.Param("id")
 	var item models.Item

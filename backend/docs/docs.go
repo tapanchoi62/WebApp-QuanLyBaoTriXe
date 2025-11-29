@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/Item": {
+        "/api/item": {
             "get": {
                 "security": [
                     {
@@ -85,7 +85,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/Item/{id}": {
+        "/api/item/{id}": {
             "get": {
                 "security": [
                     {

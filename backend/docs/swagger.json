@@ -9,7 +9,7 @@
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
-        "/api/Item": {
+        "/api/item": {
             "get": {
                 "security": [
                     {
@@ -79,7 +79,7 @@
                 }
             }
         },
-        "/api/Item/{id}": {
+        "/api/item/{id}": {
             "get": {
                 "security": [
                     {
