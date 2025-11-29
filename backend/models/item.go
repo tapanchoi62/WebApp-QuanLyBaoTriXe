@@ -1,8 +1,10 @@
 package models
 
+import "gorm.io/gorm"
+
 type Item struct {
-	ID       uint `gorm:"primaryKey"`
-	Name     string
-	Unit     string
-	Category string
+	gorm.Model `swaggerignore:"true"`
+	Name       string
+	Unit       string
+	Category   string
 }

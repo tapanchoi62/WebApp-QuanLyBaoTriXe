@@ -1,7 +1,15 @@
 package models
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type MaintenanceRequest struct {
-	ID        uint `gorm:"primaryKey"`
-	VehicleID uint
-	Status    string // Pending / Approved / Rejected
+	gorm.Model  `swaggerignore:"true"`
+	VehicleID   uint      `json:"vehicleId"`
+	Description string    `json:"description"`
+	Status      string    `json:"status"` // pending, in_progress, done
+	RequestDate time.Time `json:"requestDate"`
 }

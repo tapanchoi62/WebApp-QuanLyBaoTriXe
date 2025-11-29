@@ -1,12 +1,93 @@
 basePath: /
 definitions:
+  models.Inventory:
+    properties:
+      description:
+        description: Ghi chú
+        type: string
+      itemCode:
+        description: Mã vật tư
+        type: string
+      itemName:
+        description: Tên vật tư
+        type: string
+      minStock:
+        description: Mức tồn kho cảnh báo
+        type: integer
+      quantity:
+        description: Tồn kho
+        type: integer
+      unit:
+        description: Đơn vị tính
+        type: string
+      warehouse:
+        description: Tên kho
+        type: string
+    type: object
+  models.InventoryLog:
+    properties:
+      action:
+        description: IN | OUT | ADJUST
+        type: string
+      inventory_id:
+        type: integer
+      note:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  models.Item:
+    properties:
+      category:
+        type: string
+      name:
+        type: string
+      unit:
+        type: string
+    type: object
+  models.MaintenanceLog:
+    properties:
+      action:
+        description: created, approved, in_progress, done, cancelled
+        type: string
+      cost:
+        type: number
+      createdBy:
+        type: string
+      description:
+        type: string
+      maintenanceRequestId:
+        type: integer
+    type: object
+  models.MaintenanceRequest:
+    properties:
+      description:
+        type: string
+      requestDate:
+        type: string
+      status:
+        description: pending, in_progress, done
+        type: string
+      vehicleId:
+        type: integer
+    type: object
+  models.MaintenanceRequestItem:
+    properties:
+      cost:
+        type: number
+      itemName:
+        type: string
+      maintenanceRequestId:
+        type: integer
+      note:
+        type: string
+      status:
+        description: pending, done, cancelled
+        type: string
+    type: object
   models.Vehicle:
     properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      model:
+      model_vehicle:
         type: string
       note:
         type: string
@@ -22,6 +103,143 @@ info:
   title: Fleet Management API
   version: "1.0"
 paths:
+  /api/Item:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all Item
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all Item
+      tags:
+      - Item
+    post:
+      consumes:
+      - application/json
+      description: Create Item by JSON body
+      parameters:
+      - description: Item info
+        in: body
+        name: Item
+        required: true
+        schema:
+          $ref: '#/definitions/models.Item'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new Item
+      tags:
+      - Item
+  /api/Item/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Item by ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a Item
+      tags:
+      - Item
+    get:
+      consumes:
+      - application/json
+      description: Get a Item by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Item'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Item by ID
+      tags:
+      - Item
+    put:
+      consumes:
+      - application/json
+      description: Update Item by ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Item info
+        in: body
+        name: Item
+        required: true
+        schema:
+          $ref: '#/definitions/models.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Item'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a Item
+      tags:
+      - Item
   /api/vehicles:
     get:
       consumes:
@@ -159,6 +377,467 @@ paths:
       summary: Update a vehicle
       tags:
       - Vehicles
+  /inventory:
+    get:
+      description: Trả về toàn bộ vật tư trong kho
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Inventory'
+            type: array
+      summary: Lấy danh sách tồn kho
+      tags:
+      - Inventory
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Inventory body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Inventory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Inventory'
+      summary: Tạo mới vật tư
+      tags:
+      - Inventory
+  /inventory-log:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.InventoryLog'
+            type: array
+      summary: Get all inventory logs
+      tags:
+      - InventoryLog
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: InventoryLog
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.InventoryLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InventoryLog'
+      summary: Create inventory log
+      tags:
+      - InventoryLog
+  /inventory-log/{id}:
+    delete:
+      parameters:
+      - description: Log ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+      summary: Delete inventory log
+      tags:
+      - InventoryLog
+    get:
+      parameters:
+      - description: Log ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InventoryLog'
+      summary: Get one log
+      tags:
+      - InventoryLog
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Log ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: InventoryLog
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.InventoryLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InventoryLog'
+      summary: Update inventory log
+      tags:
+      - InventoryLog
+  /inventory/{id}:
+    delete:
+      parameters:
+      - description: Inventory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Xóa vật tư
+      tags:
+      - Inventory
+    get:
+      parameters:
+      - description: Inventory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Inventory'
+      summary: Lấy chi tiết vật tư
+      tags:
+      - Inventory
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Inventory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Inventory body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Inventory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Inventory'
+      summary: Cập nhật vật tư
+      tags:
+      - Inventory
+  /maintenance-logs:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MaintenanceLog'
+            type: array
+      summary: Get all maintenance logs
+      tags:
+      - MaintenanceLog
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Maintenance Log
+        in: body
+        name: log
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaintenanceLog'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.MaintenanceLog'
+      summary: Create maintenance log
+      tags:
+      - MaintenanceLog
+  /maintenance-logs/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: deleted
+          schema:
+            type: string
+      summary: Delete maintenance log
+      tags:
+      - MaintenanceLog
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MaintenanceLog'
+      summary: Get maintenance log by ID
+      tags:
+      - MaintenanceLog
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Maintenance Log
+        in: body
+        name: log
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaintenanceLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MaintenanceLog'
+      summary: Update maintenance log
+      tags:
+      - MaintenanceLog
+  /maintenance-request-items:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MaintenanceRequestItem'
+            type: array
+      summary: Get all maintenance request items
+      tags:
+      - MaintenanceRequestItem
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaintenanceRequestItem'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.MaintenanceRequestItem'
+      summary: Create maintenance request item
+      tags:
+      - MaintenanceRequestItem
+  /maintenance-request-items/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: deleted
+          schema:
+            type: string
+      summary: Delete maintenance request item
+      tags:
+      - MaintenanceRequestItem
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MaintenanceRequestItem'
+      summary: Get maintenance request item by ID
+      tags:
+      - MaintenanceRequestItem
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaintenanceRequestItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MaintenanceRequestItem'
+      summary: Update maintenance request item
+      tags:
+      - MaintenanceRequestItem
+  /maintenance-requests:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MaintenanceRequest'
+            type: array
+      summary: Get all maintenance requests
+      tags:
+      - MaintenanceRequest
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaintenanceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.MaintenanceRequest'
+      summary: Create maintenance request
+      tags:
+      - MaintenanceRequest
+  /maintenance-requests/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: deleted
+          schema:
+            type: string
+      summary: Delete maintenance request
+      tags:
+      - MaintenanceRequest
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MaintenanceRequest'
+      summary: Get maintenance request by ID
+      tags:
+      - MaintenanceRequest
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaintenanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MaintenanceRequest'
+      summary: Update maintenance request
+      tags:
+      - MaintenanceRequest
 securityDefinitions:
   BearerAuth:
     in: header
