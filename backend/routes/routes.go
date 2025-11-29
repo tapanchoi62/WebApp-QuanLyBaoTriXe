@@ -13,6 +13,7 @@ func RegisterRoutes(r *gin.Engine) {
 	api.Use(middleware.AuthRequired())
 	{
 		api.GET("/vehicles", controllers.GetVehicles)
+		api.GET("/vehicles/:id", controllers.GetVehicle)
 		api.POST("/vehicles", controllers.CreateVehicle)
 		api.PUT("/vehicles/:id", controllers.UpdateVehicle)
 		api.DELETE("/vehicles/:id", controllers.DeleteVehicle)

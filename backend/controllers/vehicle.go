@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/config"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/models"
+	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/utils"
 )
 
 // GetVehicles godoc
@@ -18,9 +20,19 @@ import (
 // @Security BearerAuth
 // @Router /api/vehicles [get]
 func GetVehicles(c *gin.Context) {
-	var vehicles []models.Vehicle
-	config.DB.Find(&vehicles)
-	c.JSON(http.StatusOK, vehicles)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "4"))
+	search := c.Query("search")
+
+	data, paging, err := utils.Paginate[models.Vehicle](config.DB.Model(&models.Vehicle{}), page, pageSize, search, []string{"plate_number", "model_vehicle"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":       data,
+		"pagination": paging,
+	})
 }
 
 // GetVehicle godoc
@@ -37,11 +49,15 @@ func GetVehicles(c *gin.Context) {
 func GetVehicle(c *gin.Context) {
 	id := c.Param("id")
 	var vehicle models.Vehicle
+	
 	if err := config.DB.First(&vehicle, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Vehicle not found"})
 		return
 	}
-	c.JSON(http.StatusOK, vehicle)
+	
+	c.JSON(http.StatusOK, gin.H{
+		"data": vehicle,
+	})
 }
 
 // CreateVehicle godoc
