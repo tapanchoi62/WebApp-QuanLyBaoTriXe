@@ -35,16 +35,22 @@ func main() {
 	}))
 	config.Connect()
 	config.AutoMigrate(
+		&models.Role{},
+		&models.Permission{},
 		&models.User{},
 		&models.Vehicle{},
-		&models.Inventory{},
-		&models.MaintenanceLog{},
+		&models.Item{},
+		&models.Warehouse{},
+		&models.Stock{},
+		&models.StockLog{},
 		&models.MaintenanceRequest{},
 		&models.MaintenanceRequestItem{},
-		&models.Item{},
-		&models.InventoryLog{},
-		&models.File{},
+		&models.MaintenanceRecord{},
+		&models.MaintenanceRecordItem{},
+		&models.RolePermission{},
 	)
+	config.SeedRBAC(config.DB)
+
 	routes.RegisterRoutes(r)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

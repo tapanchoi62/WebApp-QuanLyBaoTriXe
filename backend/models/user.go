@@ -1,34 +1,27 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
 
+	"gorm.io/gorm"
+)
+
+// --- User ---
 type User struct {
-	gorm.Model `swaggerignore:"true"`
-	Username   string `gorm:"unique;not null" json:"username"`
-	Password   string `json:"password"`
-	Role       string `gorm:"type:enum('admin','technician','warehouse');default:'technician'" json:"role"`
+	ID           uint   `gorm:"primaryKey"`
+	Username     string `gorm:"unique;not null"`
+	Password     string `gorm:"not null"`
+	RoleID       uint   `gorm:"not null"`
+	Role         Role
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	TokenVersion uint           // tăng khi đổi role/permission
+
 }
 
 type RegisterUser struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type UserResponse struct {
-	ID       uint   `json:"id"`
 	Username string `json:"username"`
-	Role     string `json:"role"`
-	Files    []File `json:"files"`
-}
-
-type UserInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Role     string `json:"role"`
-	FileID   string `json:"fileId"` // file đã upload trước
-}
-
-type UserInputCreate struct {
-	Username string `json:"username" binding:"required"`
-	Role     string `json:"role"`
+	Password string `json:"password"`
+	RoleID   uint   `json:"role_id"`
 }

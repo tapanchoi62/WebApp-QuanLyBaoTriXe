@@ -9,7 +9,7 @@
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
-        "/api/item": {
+        "/api/items": {
             "get": {
                 "security": [
                     {
@@ -79,7 +79,7 @@
                 }
             }
         },
-        "/api/item/{id}": {
+        "/api/items/{id}": {
             "get": {
                 "security": [
                     {
@@ -443,6 +443,11 @@
         },
         "/inventory": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Trả về toàn bộ vật tư trong kho",
                 "produces": [
                     "application/json"
@@ -464,6 +469,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -636,6 +646,11 @@
         },
         "/inventory/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -662,6 +677,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -700,6 +720,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Inventory"
                 ],

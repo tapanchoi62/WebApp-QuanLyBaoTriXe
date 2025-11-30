@@ -1,115 +1,120 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { DataTable } from '@/components/DataTable';
-import http from '@/lib/axios';
-import { useHeader } from '@/contexts/HeaderContext';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { ConfirmButton } from '@/components/ConfirmButton';
-import { User } from '../models/user';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table';
+import { usePermission } from '@/hooks/use-permission';
+import http from '@/lib/axios';
+import { useRouter } from 'next/navigation';
 
-export default function UserContainer() {
-  const [data, setData] = useState<User[]>([]);
-  const [page, setPage] = useState(1);
-  const pageSize = 20;
-  const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState('');
+interface Permission {
+  ID: number;
+  Name: string;
+}
+
+interface Role {
+  ID: number;
+  Name: string;
+  Permissions: Permission[];
+}
+
+interface User {
+  ID: number;
+  Username: string;
+  Role: Role;
+}
+
+export default function PageUser() {
+  const [users, setUsers] = useState<User[]>([]);
   const router = useRouter();
-  const { setTitle } = useHeader();
+  // Quyền
+  const canCreate = usePermission('CREATE_USER');
+  const canEdit = usePermission('EDIT_USER');
+  const canDelete = usePermission('DELETE_USER');
+  const SYS_ADMIN = usePermission('SYS_ADMIN');
 
-  useEffect(() => {
-    setTitle('User Management');
-  }, [setTitle]);
-
-  const columns: ColumnDef<User>[] = [
-    {
-      header: 'id',
-      accessorKey: 'id',
-    },
-    {
-      header: 'username',
-      accessorKey: 'username',
-    },
-    {
-      header: 'role',
-      accessorKey: 'role',
-    },
-    {
-      header: 'Actions',
-      cell: (info) => {
-        const row = info.row.original;
-        return (
-          <div className="flex flex-row gap-2">
-            <Button
-              onClick={() => router.push(`/users/${row.id}`)}
-              variant={'outline'}
-              className="rounded-2xl"
-            >
-              <Eye></Eye>
-            </Button>
-            <ConfirmButton
-              variant="destructive"
-              dialogTitle="Delete User"
-              dialogDescription="Are you sure you want to delete this User? This action cannot be undone."
-              confirmText="Delete"
-              cancelText="Cancel"
-              onConfirm={() => removeUser(row.id)}
-            >
-              <Trash2></Trash2>
-            </ConfirmButton>
-          </div>
-        );
-      },
-    },
-  ];
-
-  const removeUser = async (id: number) => {
+  const loadUsers = async () => {
     try {
-      await http.delete(`/users/${id}`);
-      toast('user deleted successfully');
-      fetchData();
-    } catch (error) {
-      console.error('Delete user failed:', error);
-      toast('Failed to delete user');
+      const res = await http.get('/users');
+      setUsers(res.data.data);
+    } catch (err) {
+      console.error(err);
     }
   };
-  const fetchData = async () => {
-    const res = await http.get('/users', {
-      params: { page, pageSize, search },
-    });
-
-    setData(res.data.data);
-    setTotal(res.data.pagination.total);
-  };
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchData();
-    }, 300); // 300ms debounce
+    loadUsers();
+  }, []);
 
-    return () => clearTimeout(timeout);
-  }, [page, search]);
-
-  const onCreate = () => {
-    router.push('/users/create');
+  const deleteUser = async (id: number) => {
+    if (!confirm('Bạn có chắc muốn xóa user này?')) return;
+    await http.delete(`/users/${id}`);
+    loadUsers();
   };
+
   return (
-    <div className="p-4">
-      <DataTable
-        onSearchChange={setSearch}
-        columns={columns}
-        data={data}
-        page={page}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
-        onCreate={onCreate}
-        search={search}
-      />
+    <div className="p-6 space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold">Quản lý User</h1>
+        {(canCreate || SYS_ADMIN) && (
+          <Button onClick={() => router.push('/manager/users/create')}>+ Tạo User</Button>
+        )}
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Username</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Permissions</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {users.map((u) => (
+            <TableRow key={u.ID}>
+              <TableCell>{u.ID}</TableCell>
+              <TableCell>{u.Username}</TableCell>
+              <TableCell>{u.Role?.Name}</TableCell>
+              <TableCell>
+                {u.Role?.Permissions?.map((p) => (
+                  <span
+                    key={p.ID}
+                    className="inline-block bg-gray-200 text-gray-800 px-2 py-1 rounded mr-1 text-xs"
+                  >
+                    {p.Name}
+                  </span>
+                ))}
+              </TableCell>
+              <TableCell className="text-right space-x-2">
+                {(canEdit || SYS_ADMIN) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => router.push('/manager/users/' + u.ID)}
+                  >
+                    Edit
+                  </Button>
+                )}
+                {(canDelete || SYS_ADMIN) && (
+                  <Button size="sm" variant="destructive" onClick={() => deleteUser(u.ID)}>
+                    Delete
+                  </Button>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

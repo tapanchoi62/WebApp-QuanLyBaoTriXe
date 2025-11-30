@@ -1,11 +1,14 @@
+'use client';
 import type { ReactNode } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { HeaderProvider } from '@/contexts/HeaderContext';
 import Header from '@/components/Header';
 import { Toaster } from '@/components/ui/sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Layout({ children }: { children: ReactNode }) {
+  useAuth();
   return (
     <div>
       <SidebarProvider

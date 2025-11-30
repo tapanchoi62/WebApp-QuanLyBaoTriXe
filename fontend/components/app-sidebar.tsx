@@ -14,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { NavDocuments } from './nav-documents';
 
 const data = {
   user: {
@@ -28,12 +29,28 @@ const data = {
       icon: IconListDetails,
     },
     {
-      title: 'Users',
-      url: '/users',
+      title: 'Items',
+      url: '/items',
+      icon: IconListDetails,
+    },
+  ],
+  navDocuments: [
+    {
+      name: 'Users',
+      url: '/manager/users',
+      icon: IconUser,
+    },
+    {
+      name: 'Roles',
+      url: '/manager/roles',
+      icon: IconUser,
+    },
+    {
+      name: 'Permissions',
+      url: '/manager/permission',
       icon: IconUser,
     },
   ],
-  navClouds: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -53,6 +70,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+      </SidebarContent>
+      <SidebarContent>
+        <NavDocuments items={data.navDocuments} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

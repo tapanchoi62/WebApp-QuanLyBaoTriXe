@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -9,14 +8,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/config"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/models"
+	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/utils"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 func Login(c *gin.Context) {
 	var input struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -24,37 +23,44 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// 1️⃣ Lấy user theo username
 	var user models.User
-	if err := config.DB.Where("username = ?", input.Username).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
-		return
-	}
 
-	// 2️⃣ So sánh password hash
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
-		return
-	}
+	// Load Role + Permission
+	err := config.DB.Preload("Role").Preload("Role.Permissions").
+		Where("username = ?", input.Username).
+		First(&user).Error
 
-	// 3️⃣ Tạo JWT
-	claims := jwt.MapClaims{
-		"user_id": user.ID,
-		"role":    user.Role,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
-		"iat":     time.Now().Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(config.JwtSecret)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Sai username hoặc password"})
 		return
 	}
 
+	// Kiểm tra password
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Sai username hoặc password"})
+		return
+	}
+
+	// Tạo JWT
+	tokenString, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Không tạo được token"})
+		return
+	}
+
+	// Extract permissions []string
+	var permissions []string
+	for _, p := range user.Role.Permissions {
+		permissions = append(permissions, p.Name)
+	}
+
+	// Trả về dữ liệu login
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
-		"token":   tokenString,
+		"token":       tokenString,
+		"id":          user.ID,
+		"username":    user.Username,
+		"role":        user.Role.Name,
+		"permissions": permissions,
 	})
 }
 
@@ -67,17 +73,17 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	// Kiểm tra username có tồn tại chưa
-	_, err := GetUserByUserName(c, input.Username)
-	if err == nil {
-		// user đã tồn tại
+	// Kiểm tra username đã tồn tại chưa
+	var existing models.User
+	if err := db.Where("username = ?", input.Username).First(&existing).Error; err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
 		return
 	}
 
-	// Nếu lỗi không phải ErrRecordNotFound → lỗi DB
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+	// Kiểm tra role_id có tồn tại không
+	var role models.Role
+	if err := db.First(&role, input.RoleID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role_id"})
 		return
 	}
 
@@ -92,18 +98,18 @@ func RegisterUser(c *gin.Context) {
 	newUser := models.User{
 		Username: input.Username,
 		Password: string(hashedPassword),
-		Role:     "technician",
+		RoleID:   input.RoleID,
 	}
 
-	// Lưu user vào DB
 	if err := db.Create(&newUser).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
 
-	// Tạo JWT token
+	// Tạo JWT token (bao gồm RoleID)
 	claims := jwt.MapClaims{
 		"username": newUser.Username,
+		"role_id":  newUser.RoleID,
 		"exp":      time.Now().Add(1 * time.Hour).Unix(),
 	}
 

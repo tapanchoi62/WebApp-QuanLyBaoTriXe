@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/item": {
+        "/api/items": {
             "get": {
                 "security": [
                     {
@@ -85,7 +85,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/item/{id}": {
+        "/api/items/{id}": {
             "get": {
                 "security": [
                     {
@@ -449,6 +449,11 @@ const docTemplate = `{
         },
         "/inventory": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Trả về toàn bộ vật tư trong kho",
                 "produces": [
                     "application/json"
@@ -470,6 +475,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -642,6 +652,11 @@ const docTemplate = `{
         },
         "/inventory/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -668,6 +683,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -706,6 +726,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Inventory"
                 ],

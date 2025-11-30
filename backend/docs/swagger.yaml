@@ -103,7 +103,7 @@ info:
   title: Fleet Management API
   version: "1.0"
 paths:
-  /api/item:
+  /api/items:
     get:
       consumes:
       - application/json
@@ -147,7 +147,7 @@ paths:
       summary: Create a new Item
       tags:
       - Item
-  /api/item/{id}:
+  /api/items/{id}:
     delete:
       consumes:
       - application/json
@@ -389,6 +389,8 @@ paths:
             items:
               $ref: '#/definitions/models.Inventory'
             type: array
+      security:
+      - BearerAuth: []
       summary: Lấy danh sách tồn kho
       tags:
       - Inventory
@@ -409,6 +411,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.Inventory'
+      security:
+      - BearerAuth: []
       summary: Tạo mới vật tư
       tags:
       - Inventory
@@ -517,6 +521,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Xóa vật tư
       tags:
       - Inventory
@@ -534,6 +540,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Inventory'
+      security:
+      - BearerAuth: []
       summary: Lấy chi tiết vật tư
       tags:
       - Inventory
@@ -559,6 +567,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Inventory'
+      security:
+      - BearerAuth: []
       summary: Cập nhật vật tư
       tags:
       - Inventory

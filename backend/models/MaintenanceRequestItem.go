@@ -1,12 +1,9 @@
 package models
 
-import "gorm.io/gorm"
-
 type MaintenanceRequestItem struct {
-	gorm.Model           `swaggerignore:"true"`
-	MaintenanceRequestID uint    `json:"maintenanceRequestId"`
-	ItemName             string  `json:"itemName"`
-	Cost                 float64 `json:"cost"`
-	Status               string  `json:"status"` // pending, done, cancelled
-	Note                 string  `json:"note"`
+	ID                   uint    `gorm:"primaryKey"`
+	MaintenanceRequestID uint    `gorm:"not null"`
+	ItemID               uint    `gorm:"not null"`
+	Quantity             float64 `gorm:"not null"`
+	Item                 Item
 }

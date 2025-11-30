@@ -1,6 +1,10 @@
 package utils
 
 import (
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/config"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/models"
 	"gorm.io/gorm"
 )
@@ -29,7 +33,7 @@ func Paginate[T any](db *gorm.DB, page int, pageSize int, search string, searchF
 	// Count total
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
-		return nil,  models.Pagination{}, err
+		return nil, models.Pagination{}, err
 	}
 
 	// Query data
@@ -47,4 +51,27 @@ func Paginate[T any](db *gorm.DB, page int, pageSize int, search string, searchF
 	}
 
 	return data, pagination, nil
+}
+
+func HasPermission(db *gorm.DB, userRole string, action string) (bool, error) {
+	var rp models.RolePermission
+	err := db.Where("role = ? AND action = ?", userRole, action).First(&rp).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func GenerateToken(userID uint) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(), // token 24h
+		"iat":     time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(config.JwtSecret)
 }

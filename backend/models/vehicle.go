@@ -1,13 +1,20 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
 type Vehicle struct {
-	gorm.Model    `swaggerignore:"true"`
-	Plate_Number  string `gorm:"unique" json:"plate_number"`
-	Model_Vehicle string `json:"model_vehicle"`
-	Year          int    `json:"year"`
-	Note          string `json:"note"`
+	ID                  uint   `gorm:"primaryKey"`
+	PlateNumber         string `gorm:"unique;not null"`
+	Model               string
+	Year                int
+	Note                string
+	MaintenanceRecords  []MaintenanceRecord
+	MaintenanceRequests []MaintenanceRequest
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	DeletedAt           gorm.DeletedAt `gorm:"index"`
 }

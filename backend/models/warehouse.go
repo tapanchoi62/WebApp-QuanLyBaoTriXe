@@ -2,11 +2,11 @@ package models
 
 import "time"
 
-type Item struct {
+// --- Warehouse ---
+type Warehouse struct {
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"not null"`
-	Category  string // Tire, Battery, Oil,...
-	Unit      string // pcs, liter,...
+	Location  string
 	Stocks    []Stock
 	CreatedAt time.Time
 	UpdatedAt time.Time

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { useHeader } from '@/contexts/HeaderContext';
@@ -11,100 +11,132 @@ import { FormHookProvider } from '@/components/FormHookProvider';
 import { toast } from 'sonner';
 
 interface UserFormProps {
-  id: string | undefined;
+  id?: string; // nếu có id => edit, ngược lại => create
 }
 
 interface UserFormValues {
   username: string;
   role: string;
-  fileId?: string;
+  password?: string;
+}
+
+interface Role {
+  id: number;
+  name: string;
 }
 
 export default function UserForm({ id }: UserFormProps) {
   const { setTitle } = useHeader();
-
-  const [, setData] = React.useState<UserFormValues | null>(null);
-  const defaultValues = {
+  const [roles, setRoles] = useState<Role[]>([]);
+  const defaultValues: UserFormValues = {
     username: '',
     role: '',
-    fileId: '',
+    password: '',
   };
+
   const form = useForm<UserFormValues>({
-    defaultValues: defaultValues,
+    defaultValues,
   });
 
   const {
-    formState: { isSubmitting },
-    reset,
     control,
+    reset,
+    formState: { isSubmitting },
   } = form;
 
-  const fetchData = async (userId: string | null) => {
+  // Lấy danh sách role từ backend
+  const fetchRoles = async () => {
     try {
-      const response = (await http.get(`/users/${userId}`)) as any;
-      const usersData = response.data;
-      setData(usersData.data);
+      const res = await http.get('/roles');
+      setRoles(res.data.data.map((r: any) => ({ id: r.ID, name: r.Name })));
+    } catch (error) {
+      console.error('Failed to load roles:', error);
+      toast.error('Failed to load roles');
+    }
+  };
+
+  // Lấy dữ liệu user nếu đang edit
+  const fetchUser = async (userId: string) => {
+    try {
+      const res = await http.get(`/users/${userId}`);
+      const user = res.data.data;
+      const roleId = roles.find((r) => r.id === user.role?.ID)?.id.toString() || '';
+
       reset({
-        username: usersData.data.username,
-        role: usersData.data.role?.toString(),
-        fileId: usersData.data.fileId?.toString(),
+        username: user.username,
+        role: roleId,
       });
     } catch (error) {
-      console.error('Fetch user failed:', error);
-      toast('Failed to load user data');
+      console.error('Failed to load user:', error);
+      toast.error('Failed to load user data');
     }
   };
 
   useEffect(() => {
-    setTitle(id ? 'Edit user' : 'Create user');
+    setTitle(id ? 'Edit User' : 'Create User');
+    fetchRoles();
+  }, []);
+
+  useEffect(() => {
     if (id) {
-      fetchData(id!);
+      fetchUser(id);
     }
-  }, [id, reset]);
+  }, [roles]);
 
   const onSubmit = async (data: UserFormValues) => {
     try {
       if (id) {
-        // Update vehicle
-        await http.put(`/users/${id}`, data);
+        // Update user
+        await http.put(`/users/${id}`, {
+          username: data.username,
+          role_id: parseInt(data.role),
+        });
       } else {
-        // Create new vehicle
+        // Create user
         await http.post('/users', {
-          ...data,
+          username: data.username,
+          password: data.password,
+          role_id: parseInt(data.role),
         });
       }
       toast.success('Saved successfully!');
     } catch (error) {
-      console.error('Save vehicle failed:', error);
+      console.error('Save failed:', error);
       toast.error('Save failed');
     }
   };
 
   return (
     <FormHookProvider form={form} onSubmit={onSubmit}>
-      <div className="flex flex-row items-center w-full gap-4">
-        <div className="w-1/2">
-          <FormInput name="username" label="Username" placeholder="Input Username" />
-        </div>
-        <div className="w-1/2">
-          <FormSelect
-            name="role"
-            control={control}
-            options={[
-              { label: 'technician', value: 'technician' },
-              { label: 'admin', value: 'admin' },
-              { label: 'warehouse', value: 'warehouse' },
-            ]}
-            placeholder="Select vehicle type"
-            isRequired
-            label="Year"
+      <div className="space-y-4 max-w-md">
+        <FormInput
+          name="username"
+          label="Username"
+          placeholder="Input username"
+          readOnly={!!id} // edit không cho sửa username
+        />
+        {!id && (
+          <FormInput
+            name="password"
+            label="Password"
+            placeholder="Input password"
+            readOnly={!!id} // edit không cho sửa username
           />
-        </div>
-      </div>
+        )}
 
-      <Button type="submit" disabled={isSubmitting}>
-        {id ? 'Update Vehicle' : 'Create Vehicle'}
-      </Button>
+        <FormSelect
+          name="role"
+          control={control}
+          options={roles.map((r) => ({ label: r.name, value: r.id.toString() }))}
+          placeholder="Select role"
+          label="Role"
+          isRequired
+        />
+
+        <Button type="submit" disabled={isSubmitting}>
+          {id ? 'Update User' : 'Create User'}
+        </Button>
+      </div>
     </FormHookProvider>
   );
 }

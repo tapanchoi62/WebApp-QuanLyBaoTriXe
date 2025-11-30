@@ -2,12 +2,12 @@ package models
 
 import "time"
 
-type Item struct {
+// --- Supplier (Nhà cung cấp) ---
+type Supplier struct {
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"not null"`
-	Category  string // Tire, Battery, Oil,...
-	Unit      string // pcs, liter,...
-	Stocks    []Stock
+	Contact   string
+	StockLogs []StockLog
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
