@@ -1,32 +1,29 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/DataTable";
-import http from "@/lib/axios";
-import { useHeader } from "@/contexts/HeaderContext";
-import { Vehicle } from "../models/vehicle";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Eye, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { ConfirmButton } from "@/components/ConfirmButton";
-
+import { useEffect, useState } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { DataTable } from '@/components/DataTable';
+import http from '@/lib/axios';
+import { useHeader } from '@/contexts/HeaderContext';
+import { Vehicle } from '../models/vehicle';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Eye, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { ConfirmButton } from '@/components/ConfirmButton';
 
 export default function VehicleContainer() {
   const [data, setData] = useState<Vehicle[]>([]);
   const [page, setPage] = useState(1);
   const pageSize = 4;
   const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const router = useRouter();
-  const {setTitle} = useHeader();
+  const { setTitle } = useHeader();
 
   useEffect(() => {
-    setTitle("Vehicle Management");
+    setTitle('Vehicle Management');
   }, [setTitle]);
-
-
 
   const columns: ColumnDef<Vehicle>[] = [
     {
@@ -52,19 +49,19 @@ export default function VehicleContainer() {
     {
       header: 'Ngày tạo',
       accessorKey: 'CreatedAt',
-      cell: info => new Date(info.getValue() as string).toLocaleString(), // format ngày giờ
+      cell: (info) => new Date(info.getValue() as string).toLocaleString(), // format ngày giờ
     },
     {
       header: 'Ngày cập nhật',
       accessorKey: 'UpdatedAt',
-      cell: info => {
+      cell: (info) => {
         const val = info.getValue() as string;
-        return val === "0001-01-01T00:00:00Z" ? '-' : new Date(val).toLocaleString();
+        return val === '0001-01-01T00:00:00Z' ? '-' : new Date(val).toLocaleString();
       },
     },
     {
       header: 'Actions',
-      cell: info => {
+      cell: (info) => {
         const row = info.row.original;
         return (
           <div className="flex flex-row gap-2">
@@ -86,24 +83,23 @@ export default function VehicleContainer() {
               <Trash2></Trash2>
             </ConfirmButton>
           </div>
-          
         );
-      }
-    }
+      },
+    },
   ];
 
   const removeVehicle = async (id: number) => {
     try {
       await http.delete(`/vehicles/${id}`);
-      toast("Vehicle deleted successfully");
+      toast('Vehicle deleted successfully');
       fetchData();
     } catch (error) {
-      console.error("Delete vehicle failed:", error);
-      toast("Failed to delete vehicle");
+      console.error('Delete vehicle failed:', error);
+      toast('Failed to delete vehicle');
     }
   };
   const fetchData = async () => {
-    const res = await http.get("/vehicles", {
+    const res = await http.get('/vehicles', {
       params: { page, pageSize, search },
     });
 
@@ -120,8 +116,8 @@ export default function VehicleContainer() {
   }, [page, search]);
 
   const onCreate = () => {
-    router.push("/vehicles/create");
-  }
+    router.push('/vehicles/create');
+  };
   return (
     <div className="p-4">
       <DataTable
