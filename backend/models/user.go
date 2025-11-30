@@ -13,3 +13,22 @@ type RegisterUser struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type UserResponse struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
+	Files    []File `json:"files"`
+}
+
+type UserInput struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Role     string `json:"role"`
+	FileID   string `json:"fileId"` // file đã upload trước
+}
+
+type UserInputCreate struct {
+	Username string `json:"username" binding:"required"`
+	Role     string `json:"role"`
+}

@@ -11,6 +11,7 @@ import (
 	_ "github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/docs"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/models"
 	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/routes"
+	"github.com/tapanchoi62/WebApp-QuanLyBaoTriXe/backend/services"
 )
 
 // @title Fleet Management API
@@ -23,6 +24,7 @@ import (
 // @name Authorization
 func main() {
 	r := gin.Default()
+	services.StartCronJobs()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"}, // frontend
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -41,6 +43,7 @@ func main() {
 		&models.MaintenanceRequestItem{},
 		&models.Item{},
 		&models.InventoryLog{},
+		&models.File{},
 	)
 	routes.RegisterRoutes(r)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

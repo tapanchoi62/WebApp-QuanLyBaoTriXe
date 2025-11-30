@@ -5,15 +5,15 @@ import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/DataTable';
 import http from '@/lib/axios';
 import { useHeader } from '@/contexts/HeaderContext';
-import { Vehicle } from '../models/vehicle';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Eye, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ConfirmButton } from '@/components/ConfirmButton';
+import { User } from '../models/user';
 
-export default function VehicleContainer() {
-  const [data, setData] = useState<Vehicle[]>([]);
+export default function UserContainer() {
+  const [data, setData] = useState<User[]>([]);
   const [page, setPage] = useState(1);
   const pageSize = 20;
   const [total, setTotal] = useState(0);
@@ -22,42 +22,21 @@ export default function VehicleContainer() {
   const { setTitle } = useHeader();
 
   useEffect(() => {
-    setTitle('Vehicle Management');
+    setTitle('User Management');
   }, [setTitle]);
 
-  const columns: ColumnDef<Vehicle>[] = [
+  const columns: ColumnDef<User>[] = [
     {
-      header: 'ID',
-      accessorKey: 'ID',
+      header: 'id',
+      accessorKey: 'id',
     },
     {
-      header: 'Biển số',
-      accessorKey: 'plate_number',
+      header: 'username',
+      accessorKey: 'username',
     },
     {
-      header: 'Năm SX',
-      accessorKey: 'year',
-    },
-    {
-      header: 'Ghi chú',
-      accessorKey: 'note',
-    },
-    {
-      header: 'Model',
-      accessorKey: 'model_vehicle',
-    },
-    {
-      header: 'Ngày tạo',
-      accessorKey: 'CreatedAt',
-      cell: (info) => new Date(info.getValue() as string).toLocaleString(), // format ngày giờ
-    },
-    {
-      header: 'Ngày cập nhật',
-      accessorKey: 'UpdatedAt',
-      cell: (info) => {
-        const val = info.getValue() as string;
-        return val === '0001-01-01T00:00:00Z' ? '-' : new Date(val).toLocaleString();
-      },
+      header: 'role',
+      accessorKey: 'role',
     },
     {
       header: 'Actions',
@@ -66,7 +45,7 @@ export default function VehicleContainer() {
         return (
           <div className="flex flex-row gap-2">
             <Button
-              onClick={() => router.push(`/vehicles/${row.ID}`)}
+              onClick={() => router.push(`/users/${row.id}`)}
               variant={'outline'}
               className="rounded-2xl"
             >
@@ -74,11 +53,11 @@ export default function VehicleContainer() {
             </Button>
             <ConfirmButton
               variant="destructive"
-              dialogTitle="Delete Vehicle"
-              dialogDescription="Are you sure you want to delete this vehicle? This action cannot be undone."
+              dialogTitle="Delete User"
+              dialogDescription="Are you sure you want to delete this User? This action cannot be undone."
               confirmText="Delete"
               cancelText="Cancel"
-              onConfirm={() => removeVehicle(row.ID)}
+              onConfirm={() => removeUser(row.id)}
             >
               <Trash2></Trash2>
             </ConfirmButton>
@@ -88,18 +67,18 @@ export default function VehicleContainer() {
     },
   ];
 
-  const removeVehicle = async (id: number) => {
+  const removeUser = async (id: number) => {
     try {
-      await http.delete(`/vehicles/${id}`);
-      toast('Vehicle deleted successfully');
+      await http.delete(`/users/${id}`);
+      toast('user deleted successfully');
       fetchData();
     } catch (error) {
-      console.error('Delete vehicle failed:', error);
-      toast('Failed to delete vehicle');
+      console.error('Delete user failed:', error);
+      toast('Failed to delete user');
     }
   };
   const fetchData = async () => {
-    const res = await http.get('/vehicles', {
+    const res = await http.get('/users', {
       params: { page, pageSize, search },
     });
 
@@ -116,7 +95,7 @@ export default function VehicleContainer() {
   }, [page, search]);
 
   const onCreate = () => {
-    router.push('/vehicles/create');
+    router.push('/users/create');
   };
   return (
     <div className="p-4">

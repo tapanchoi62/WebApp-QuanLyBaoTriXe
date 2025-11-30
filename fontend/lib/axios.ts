@@ -1,19 +1,21 @@
-import axios from "axios";
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8088";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8088';
 
 export const http = axios.create({
   baseURL: API_BASE,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
 // Interceptor để tự động thêm JWT nếu có
 http.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = Cookies.get('token');
+
   if (token && config.headers) {
-    config.headers["Authorization"] = `Bearer ${token}`;
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
   return config;
 });
