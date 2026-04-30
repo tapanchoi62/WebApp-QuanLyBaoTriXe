@@ -7,14 +7,14 @@ import (
 )
 
 type Vehicle struct {
-	ID                  uint   `gorm:"primaryKey"`
-	PlateNumber         string `gorm:"unique;not null"`
-	Model               string
-	Year                int
-	Note                string
-	MaintenanceRecords  []MaintenanceRecord
-	MaintenanceRequests []MaintenanceRequest
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
-	DeletedAt           gorm.DeletedAt `gorm:"index"`
+	ID                  uint           `gorm:"primaryKey" json:"ID"`
+	PlateNumber         string         `gorm:"unique;not null" json:"plate_number"`
+	Model               string         `gorm:"column:model" json:"model_vehicle"`
+	Year                int            `json:"year"`
+	Note                string         `json:"note"`
+	MaintenanceRecords  []MaintenanceRecord  `json:"-"`
+	MaintenanceRequests []MaintenanceRequest `json:"-"`
+	CreatedAt           time.Time      `json:"CreatedAt"`
+	UpdatedAt           time.Time      `json:"UpdatedAt"`
+	DeletedAt           gorm.DeletedAt `gorm:"index" json:"-"`
 }

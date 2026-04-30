@@ -14,7 +14,7 @@ var DB *gorm.DB
 func Connect() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		getEnv("DB_USER", "root"),
-		getEnv("DB_PASSWORD", "123456"),
+		getEnv("DB_PASSWORD", "Minhtu@123"),
 		getEnv("DB_HOST", "localhost"),
 		getEnv("DB_PORT", "3306"),
 		getEnv("DB_NAME", "fleet"),

@@ -3,11 +3,11 @@ package models
 import "time"
 
 type Item struct {
-	ID        uint   `gorm:"primaryKey"`
-	Name      string `gorm:"not null"`
-	Category  string // Tire, Battery, Oil,...
-	Unit      string // pcs, liter,...
-	Stocks    []Stock
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uint      `gorm:"primaryKey" json:"ID"`
+	Name      string    `gorm:"not null" json:"name"`
+	Category  string    `json:"category"`
+	Unit      string    `json:"unit"`
+	Stocks    []Stock   `json:"-"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
 }

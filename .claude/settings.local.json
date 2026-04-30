@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go build *)",
+      "Bash(npx tsc *)",
+      "Bash(npm install *)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(./node_modules/.bin/tsc --noEmit)"
+    ]
+  }
+}
