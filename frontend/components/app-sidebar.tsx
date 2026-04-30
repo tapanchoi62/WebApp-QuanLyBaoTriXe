@@ -33,6 +33,21 @@ const data = {
       url: '/items',
       icon: IconListDetails,
     },
+    {
+      title: 'Inventory',
+      url: '/inventory',
+      icon: IconListDetails,
+    },
+    {
+      title: 'Warehouses',
+      url: '/warehouses',
+      icon: IconListDetails,
+    },
+    {
+      title: 'Stock Logs',
+      url: '/stock-logs',
+      icon: IconListDetails,
+    },
   ],
   navDocuments: [
     {

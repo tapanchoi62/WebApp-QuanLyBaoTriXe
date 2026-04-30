@@ -2,12 +2,11 @@ package models
 
 import "time"
 
-// --- Warehouse ---
 type Warehouse struct {
-	ID        uint   `gorm:"primaryKey"`
-	Name      string `gorm:"not null"`
-	Location  string
-	Stocks    []Stock
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uint      `gorm:"primaryKey" json:"ID"`
+	Name      string    `gorm:"not null" json:"name"`
+	Location  string    `json:"location"`
+	Stocks    []Stock   `json:"-"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
 }

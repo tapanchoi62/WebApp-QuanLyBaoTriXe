@@ -41,5 +41,18 @@ func RegisterRoutes(r *gin.Engine) {
 		api.POST("/items", controllers.CreateItem)
 		api.PUT("/items/:id", controllers.UpdateItem)
 		api.DELETE("/items/:id", controllers.DeleteItem)
+
+		api.GET("/warehouses", controllers.GetWarehouses)
+		api.POST("/warehouses", controllers.CreateWarehouse)
+		api.PUT("/warehouses/:id", controllers.UpdateWarehouse)
+		api.DELETE("/warehouses/:id", controllers.DeleteWarehouse)
+		api.GET("/warehouses/:id/stocks", controllers.GetStocksByWarehouse)
+
+		api.GET("/stocks", controllers.GetStocks)
+		api.POST("/stocks/transaction", controllers.StockTransaction)
+
+		api.GET("/stock-logs", controllers.GetStockLogs)
+
+		api.GET("/suppliers", controllers.GetSuppliers)
 	}
 }
